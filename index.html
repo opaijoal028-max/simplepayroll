@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Simple Payroll System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16v16H4z"/><path d="M8 4v16M4 10h4M4 15h4"/>
+        </svg>
+      </span>
+      <span class="brand-name">Simple Payroll</span>
+    </div>
+
+    <nav class="nav" aria-label="Workspace">
+      <p class="nav-label">Payroll desk</p>
+
+      <button class="nav-item" type="button" data-view="dashboard">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
+            <rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+          </svg>
+        </span>
+        <span class="nav-text">Summary</span>
+      </button>
+
+      <button class="nav-item" type="button" data-view="employees">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <span class="nav-text">Employees</span>
+        <span class="nav-count" id="nav-count-employees">0</span>
+      </button>
+
+      <button class="nav-item" type="button" data-view="payroll">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/>
+            <line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/>
+            <path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+          </svg>
+        </span>
+        <span class="nav-text">Run payroll</span>
+      </button>
+
+      <button class="nav-item" type="button" data-view="history">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+            <path d="M12 7v5l4 2"/>
+          </svg>
+        </span>
+        <span class="nav-text">History</span>
+        <span class="nav-count" id="nav-count-records">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <p class="foot-label">Current period</p>
+      <p class="foot-value" id="side-period">—</p>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-text">
+        <h1 class="page-title" id="page-title">Payroll summary</h1>
+        <p class="page-sub" id="page-sub">Meridian Supply Co.</p>
+      </div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </header>
+
+    <main class="content" id="main">
+
+      <!-- Summary -->
+      <section class="view" id="view-dashboard" aria-labelledby="page-title">
+        <div class="stat-row" id="dash-stats"></div>
+
+        <div class="dash-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Net payroll by month</h2>
+              <p class="panel-sub" id="chart-sub">Last six months</p>
+            </div>
+            <div class="chart" id="chart"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Largest net pay</h2>
+              <p class="panel-sub" id="ranked-sub">—</p>
+            </div>
+            <ul class="rank" id="ranked-list"></ul>
+          </section>
+        </div>
+
+        <section class="panel pending-panel">
+          <div class="panel-head">
+            <h2>Still to pay</h2>
+            <p class="panel-sub" id="pending-sub">—</p>
+          </div>
+          <ul class="pending" id="pending-list"></ul>
+          <p class="pending-done" id="pending-done" hidden></p>
+        </section>
+      </section>
+
+      <!-- Employees -->
+      <section class="view" id="view-employees" hidden>
+        <div class="toolbar">
+          <div class="search">
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </span>
+            <input class="input" id="emp-search" type="search" placeholder="Search" aria-label="Search employees by ID or name" autocomplete="off">
+          </div>
+          <p class="toolbar-meta" id="emp-count">—</p>
+        </div>
+
+        <div class="panel panel-flush">
+          <div class="table-wrap">
+            <table class="table">
+              <caption class="sr-only">Employee records</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="col-id">Employee ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col" class="col-position">Position</th>
+                  <th scope="col" class="num">Basic salary</th>
+                  <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="emp-body"></tbody>
+              <tfoot id="emp-foot"></tfoot>
+            </table>
+          </div>
+          <p class="empty" id="emp-empty" hidden></p>
+        </div>
+      </section>
+
+      <!-- Run payroll -->
+      <section class="view" id="view-payroll" hidden>
+        <div class="split">
+          <form class="panel form" id="payroll-form" novalidate>
+            <div class="panel-head">
+              <h2>New payroll record</h2>
+            </div>
+
+            <div class="alert" id="pf-alert" role="alert" hidden></div>
+
+            <div class="field">
+              <label for="pf-employee">Employee</label>
+              <select class="input" id="pf-employee">
+                <option value="">Select an employee</option>
+              </select>
+              <p class="field-error" id="pf-employee-err" hidden></p>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="pf-month">Payroll month</label>
+                <input class="input" id="pf-month" type="month">
+                <p class="field-error" id="pf-month-err" hidden></p>
+              </div>
+              <div class="field">
+                <label for="pf-basic">Basic salary</label>
+                <input class="input money-input" id="pf-basic" type="text" value="$0.00" readonly tabindex="-1" aria-readonly="true">
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="pf-allowances">Allowances</label>
+                <input class="input money-input" id="pf-allowances" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="0">
+              </div>
+              <div class="field">
+                <label for="pf-deductions">Deductions</label>
+                <input class="input money-input" id="pf-deductions" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="0">
+              </div>
+            </div>
+
+            <p class="form-note">
+              Gross pay is basic salary plus allowances. Net pay is gross pay minus deductions.
+            </p>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Save payroll record</button>
+              <button class="btn btn-secondary" type="reset" id="pf-reset">Clear</button>
+            </div>
+          </form>
+
+          <aside class="panel preview" id="payroll-preview" aria-live="polite">
+            <!-- filled by app.js -->
+          </aside>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="view" id="view-history" hidden>
+        <div class="toolbar">
+          <div class="toolbar-fields">
+            <div class="field field-inline">
+              <label for="hist-month">Month</label>
+              <select class="input" id="hist-month"></select>
+            </div>
+            <div class="search">
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+              </span>
+              <input class="input" id="hist-search" type="search" placeholder="Search" aria-label="Search payroll history by employee ID or name" autocomplete="off">
+            </div>
+          </div>
+          <p class="toolbar-meta" id="hist-count">—</p>
+        </div>
+
+        <div class="panel panel-flush">
+          <div class="table-wrap">
+            <table class="table">
+              <caption class="sr-only">Payroll history</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="col-id">Payslip no.</th>
+                  <th scope="col">Employee</th>
+                  <th scope="col" class="col-month">Month</th>
+                  <th scope="col" class="num col-basic">Basic</th>
+                  <th scope="col" class="num col-allow">Allowances</th>
+                  <th scope="col" class="num col-gross">Gross</th>
+                  <th scope="col" class="num col-ded">Deductions</th>
+                  <th scope="col" class="num">Net pay</th>
+                  <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="hist-body"></tbody>
+              <tfoot id="hist-foot"></tfoot>
+            </table>
+          </div>
+          <p class="empty" id="hist-empty" hidden></p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Employee form -->
+<dialog class="dialog" id="dlg-employee" aria-labelledby="ef-title">
+  <form class="dialog-card" id="emp-form" novalidate>
+    <div class="dialog-head">
+      <h2 id="ef-title">Add employee</h2>
+      <button class="btn btn-icon" type="button" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <label for="ef-id">Employee ID</label>
+      <input class="input mono-input" id="ef-id" type="text" required autocomplete="off">
+      <p class="field-error" id="ef-id-err" hidden></p>
+    </div>
+
+    <div class="field">
+      <label for="ef-name">Full name</label>
+      <input class="input" id="ef-name" type="text" required autocomplete="off">
+      <p class="field-error" id="ef-name-err" hidden></p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="ef-position">Position</label>
+        <input class="input" id="ef-position" type="text" required autocomplete="off">
+        <p class="field-error" id="ef-position-err" hidden></p>
+      </div>
+      <div class="field">
+        <label for="ef-salary">Basic salary</label>
+        <input class="input money-input" id="ef-salary" type="number" inputmode="decimal" min="0" step="0.01" required>
+        <p class="field-error" id="ef-salary-err" hidden></p>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" type="button" data-close>Cancel</button>
+      <button class="btn btn-primary" type="submit" id="ef-submit">Save employee</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirm -->
+<dialog class="dialog" id="dlg-confirm" aria-labelledby="confirm-title">
+  <div class="dialog-card dialog-narrow">
+    <div class="dialog-head">
+      <h2 id="confirm-title">Confirm</h2>
+    </div>
+    <p class="dialog-text" id="confirm-text"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" type="button" id="confirm-cancel">Cancel</button>
+      <button class="btn btn-danger-solid" type="button" id="confirm-ok">Delete</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Payslip -->
+<dialog class="dialog dialog-payslip" id="dlg-payslip" aria-labelledby="payslip-title">
+  <div class="dialog-card dialog-sheet">
+    <div class="dialog-head no-print">
+      <h2 id="payslip-title">Payslip</h2>
+      <div class="dialog-head-actions">
+        <button class="btn btn-secondary" type="button" id="payslip-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <path d="M6 9V3h12v6"/><rect width="12" height="8" x="6" y="14" rx="1"/>
+          </svg>
+          Print
+        </button>
+        <button class="btn btn-icon" type="button" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="payslip-body"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div id="print-root"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
